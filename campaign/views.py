@@ -38,7 +38,10 @@ def book_dose(request):
 @login_required
 def add_review(request, vaccine_id):
     vaccine = Vaccine.objects.get(id=vaccine_id)
-    # Check if the user has booked a dose for this campaign
+    # Get the associated campaign for this vaccine
+    campaign = vaccine.campaign  # Assuming there is a ForeignKey from Vaccine to Campaign
+
+    # Check if the user has booked a dose for this vaccine
     has_booking = DoseBooking.objects.filter(patient=request.user, schedule__vaccine=vaccine).exists()
 
     if not has_booking:
@@ -48,7 +51,7 @@ def add_review(request, vaccine_id):
         form = CampaignReviewForm(request.POST)
         if form.is_valid():
             review = form.save(commit=False)
-            review.campaign = vaccine
+            review.campaign = campaign  # Set the campaign from the vaccine
             review.patient = request.user
             review.save()
             return redirect('campaign_review_success')  # Redirect to a success page
@@ -56,6 +59,7 @@ def add_review(request, vaccine_id):
         form = CampaignReviewForm()
 
     return render(request, "campaign/add_review.html", {"form": form, "vaccine": vaccine})
+
 
 
 
