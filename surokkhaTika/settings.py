@@ -89,6 +89,12 @@ DATABASES = {
 }
 
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://surokkhatikaa.onrender.com',
+    'http://localhost:8000'
+]
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
