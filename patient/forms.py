@@ -24,7 +24,7 @@ class UserRegistrationForm(forms.ModelForm):
 class PatientForm(forms.ModelForm):
     class Meta:
         model = Patient
-        fields = ['nid', 'birth_date', 'gender', 'phone_number']  # Add other patient fields as needed
+        fields = ['nid', 'birth_date', 'gender', 'phone_number']
 
 
 
@@ -39,4 +39,4 @@ class LoginForm(forms.Form):
 class UserProfileForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']  # Include any other fields you want users to edit
+        fields = ['first_name', 'last_name', 'email']

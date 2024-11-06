@@ -34,4 +34,4 @@ class DoctorForm(forms.ModelForm):
 
     class Meta:
         model = Doctor
-        fields = ['designation', 'specialization']  # No need for role field
+        fields = ['designation', 'specialization']

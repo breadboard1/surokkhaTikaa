@@ -17,21 +17,17 @@ def patient_registration_view(request):
         patient_form = PatientForm(request.POST)
 
         if user_form.is_valid() and patient_form.is_valid():
-            # Save the User model instance
             user = user_form.save(commit=False)
-            user.set_password(user_form.cleaned_data['password'])  # Hash the password
+            user.set_password(user_form.cleaned_data['password'])
             user.save()
 
-            # Save the Patient model instance
             patient = patient_form.save(commit=False)
             patient.user = user
             patient.save()
 
-            # Log the user in and redirect
             login(request, user)
             messages.success(request, "Patient registration successful!")
-            return redirect('home')  # Redirect to an appropriate page after registration
-
+            return redirect('home')
     else:
         user_form = UserRegistrationForm()
         patient_form = PatientForm()
@@ -55,13 +51,12 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                # Check if the user is a doctor or a patient
                 if hasattr(user, 'doctor'):
                     messages.success(request, "Welcome, Doctor!")
-                    return redirect('home')  # Redirect to a doctor-specific dashboard
+                    return redirect('home')
                 elif hasattr(user, 'patient'):
                     messages.success(request, "Welcome, Patient!")
-                    return redirect('home')  # Redirect to a patient-specific dashboard
+                    return redirect('home')
                 else:
                     messages.error(request, "User role is not recognized.")
             else:
@@ -76,12 +71,12 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     messages.success(request, "You have been logged out.")
-    return redirect('login')  # Redirect to the login page
+    return redirect('login')
 
 
 def home_view(request):
-    vaccines = Vaccine.objects.all()  # Assuming you have a Vaccine model
-    campaigns = Campaign.objects.all()  # Assuming you have a Campaign model
+    vaccines = Vaccine.objects.all()
+    campaigns = Campaign.objects.all()
     context = {
         'vaccines': vaccines,
         'campaigns': campaigns,
@@ -102,11 +97,10 @@ def profile_view(request):
         if form.is_valid():
             form.save()
             messages.success(request, 'Your profile has been updated successfully.')
-            return redirect('profile')  # Redirect to profile page after updating
+            return redirect('profile')
     else:
         form = UserProfileForm(instance=user)
 
-    # Retrieve all dose bookings for the current user
     booked_campaigns = DoseBooking.objects.filter(patient=user).select_related('schedule__vaccine')
 
     context = {
@@ -123,9 +117,9 @@ def password_change_view(request):
         form = PasswordChangeForm(user=request.user, data=request.POST)
         if form.is_valid():
             user = form.save()
-            update_session_auth_hash(request, user)  # Keeps the user logged in after password change
+            update_session_auth_hash(request, user)
             messages.success(request, 'Your password has been updated successfully.')
-            return redirect('profile')  # Redirect to the profile page or any other page after saving
+            return redirect('profile')
     else:
         form = PasswordChangeForm(user=request.user)
 

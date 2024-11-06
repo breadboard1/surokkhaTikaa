@@ -21,13 +21,13 @@ class Doctor(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     designation = models.ManyToManyField(Designation)
     specialization = models.ManyToManyField(Specialization)
-    role = models.CharField(max_length=10, default="Doctor", editable=False)  # Automatically set role
+    role = models.CharField(max_length=10, default="Doctor", editable=False)
 
     def __str__(self):
         return f"Dr. {self.user.first_name} {self.user.last_name}"
 
 
     def save(self, *args, **kwargs):
-        self.role = "Doctor"  # Reinforce the role
+        self.role = "Doctor"
         super().save(*args, **kwargs)
 

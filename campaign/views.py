@@ -18,15 +18,12 @@ def book_dose(request):
             dose_booking = form.save(commit=False)
             dose_booking.patient = request.user
             dose_booking.save()
-            # Reduce the available slot count
             dose_booking.schedule.available_slots -= 1
             dose_booking.schedule.save()
 
-            # Get the related campaign and vaccine details
-            campaign = dose_booking.schedule.campaign  # Now this should work
+            campaign = dose_booking.schedule.campaign
             vaccine = campaign.vaccine
 
-            # Redirect to the booking success page with campaign and vaccine info
             return redirect('dose_booking_success', campaign_id=campaign.id, vaccine_id=vaccine.id)
     else:
         form = DoseBookingForm()
@@ -38,10 +35,8 @@ def book_dose(request):
 @login_required
 def add_review(request, vaccine_id):
     vaccine = Vaccine.objects.get(id=vaccine_id)
-    # Get the associated campaign for this vaccine
-    campaign = vaccine.campaign  # Assuming there is a ForeignKey from Vaccine to Campaign
+    campaign = vaccine.campaign
 
-    # Check if the user has booked a dose for this vaccine
     has_booking = DoseBooking.objects.filter(patient=request.user, schedule__vaccine=vaccine).exists()
 
     if not has_booking:
@@ -51,10 +46,10 @@ def add_review(request, vaccine_id):
         form = CampaignReviewForm(request.POST)
         if form.is_valid():
             review = form.save(commit=False)
-            review.campaign = campaign  # Set the campaign from the vaccine
+            review.campaign = campaign
             review.patient = request.user
             review.save()
-            return redirect('campaign_review_success')  # Redirect to a success page
+            return redirect('campaign_review_success')
     else:
         form = CampaignReviewForm()
 
@@ -80,9 +75,9 @@ def create_campaign(request):
         form = CampaignForm(request.POST)
         if form.is_valid():
             campaign = form.save(commit=False)
-            campaign.doctor = request.user  # Set the campaign's doctor
+            campaign.doctor = request.user
             campaign.save()
-            return redirect('campaign_list')  # Redirect to the campaign list
+            return redirect('campaign_list')
     else:
         form = CampaignForm()
 
@@ -115,19 +110,15 @@ def campaign_list(request):
 
 
 def campaign_detail_view(request, campaign_id):
-    # Get the campaign or return a 404 if it doesn't exist
     campaign = get_object_or_404(Campaign, id=campaign_id)
-    reviews = campaign.reviews.all()  # Access the reviews through the related_name
+    reviews = campaign.reviews.all()
 
-    # Initialize user_booking to False by default
     user_booking = False
 
-    # Check if the user is authenticated and has booked the dose for this campaign
     if request.user.is_authenticated:
         user_booking = DoseBooking.objects.filter(patient=request.user, schedule__vaccine=campaign.vaccine).exists()
 
     if request.method == 'POST':
-        # Only proceed if the user is authenticated and has booked the campaign
         if not user_booking:
             messages.error(request, 'You must book this campaign before leaving a review.')
             return redirect('campaign_detail', campaign_id=campaign.id)
@@ -135,8 +126,8 @@ def campaign_detail_view(request, campaign_id):
         form = CampaignReviewForm(request.POST)
         if form.is_valid():
             review = form.save(commit=False)
-            review.campaign = campaign  # Associate the review with the campaign
-            review.patient = request.user  # Associate the review with the logged-in user
+            review.campaign = campaign
+            review.patient = request.user
             review.save()
             messages.success(request, 'Your review has been submitted successfully.')
             return redirect('campaign_detail', campaign_id=campaign.id)
@@ -147,9 +138,9 @@ def campaign_detail_view(request, campaign_id):
         'campaign': campaign,
         'reviews': reviews,
         'form': form,
-        'user_can_review': user_booking,  # Pass this variable to the template
-        'vaccine_name': campaign.vaccine.name,  # Pass vaccine name to template
-        'doctor_name': campaign.doctor.username if campaign.doctor else 'N/A',  # Pass doctor name to template
+        'user_can_review': user_booking,
+        'vaccine_name': campaign.vaccine.name,
+        'doctor_name': campaign.doctor.username if campaign.doctor else 'N/A',
     }
 
     return render(request, 'campaign/campaign_detail.html', context)
@@ -157,7 +148,6 @@ def campaign_detail_view(request, campaign_id):
 
 @login_required
 def dose_booking_success(request, campaign_id, vaccine_id):
-    # Get the campaign and vaccine objects
     campaign = get_object_or_404(Campaign, id=campaign_id)
     vaccine = get_object_or_404(Vaccine, id=vaccine_id)
 

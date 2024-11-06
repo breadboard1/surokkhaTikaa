@@ -36,7 +36,7 @@ def access_denied(request):
 
 
 def vaccine_list(request):
-    vaccines = Vaccine.objects.all()  # Retrieve all vaccines from the database
+    vaccines = Vaccine.objects.all()
     return render(request, 'vaccine/vaccine_list.html', {'vaccines': vaccines})
 
 

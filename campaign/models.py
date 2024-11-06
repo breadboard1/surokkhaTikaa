@@ -24,9 +24,9 @@ class Campaign(models.Model):
 
 class VaccineSchedule(models.Model):
     vaccine = models.ForeignKey(Vaccine, on_delete=models.CASCADE, related_name='schedules')
-    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name='schedules')  # Adding ForeignKey to Campaign
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name='schedules')
     date = models.DateField()
-    available_slots = models.IntegerField()  # Track available slots
+    available_slots = models.IntegerField()
 
     def __str__(self):
         return f"{self.vaccine.name} - {self.date}"
@@ -40,7 +40,7 @@ class DoseBooking(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.second_dose_date:
-            self.second_dose_date = self.first_dose_date + timedelta(days=30)  # Set 2nd dose after 30 days
+            self.second_dose_date = self.first_dose_date + timedelta(days=30)
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -48,11 +48,11 @@ class DoseBooking(models.Model):
 
 
 class CampaignReview(models.Model):
-    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name='reviews')  # Changed from Vaccine to Campaign
+    campaign = models.ForeignKey(Campaign, on_delete=models.CASCADE, related_name='reviews')
     patient = models.ForeignKey(User, on_delete=models.CASCADE)
     review = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Review by {self.patient.username} for {self.campaign.title}"  # Adjusted to show campaign title
+        return f"Review by {self.patient.username} for {self.campaign.title}"
 
